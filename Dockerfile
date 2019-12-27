@@ -1,11 +1,13 @@
-FROM zabbix/zabbix-web-nginx-mysql:alpine-3.0.29
+FROM monitoringartist/dockbix-xxl:3.4.14
 LABEL maintainer="ccmite"
 WORKDIR /
 COPY start.sh /
 
 RUN : "add package" && \
-    apk --update add postfix rsyslog && \
-    rm -rf /var/cache/apk/* && \
+    yum -y update && yum -y install postfix rsyslog && \
+    rm -rf /var/cache/yum/* && \
+    yum clean all && \
+    localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 && \
     cp /etc/postfix/main.cf /etc/postfix/main.cf.org && \
     sed -i 's/#myhostname = host.domain.tld/myhostname = ccmite.com/g' /etc/postfix/main.cf && \
     sed -i 's/#mydomain = domain.tld/mydomain = ccmite.com/g' /etc/postfix/main.cf && \
@@ -20,11 +22,11 @@ RUN : "add package" && \
     echo "smtp_sasl_security_options = noanonymous" >> /etc/postfix/main.cf && \
     echo "smtp_sasl_mechanism_filter = plain" >> /etc/postfix/main.cf && \
     echo "smtp_use_tls = yes" >> /etc/postfix/main.cf && \
-    echo "[smtp.gmail.com]:587 ${GmailU}@gmail.com:${GmailP}" > /etc/postfix/sasl_passwd && \
-    chmod 600 /etc/postfix/sasl_passwd && \
-    postmap hash:/etc/postfix/sasl_passwd && \
     chmod +x /start.sh
+ENV LANG="ja_JP.UTF-8" \
+    LANGUAGE="ja_JP:ja" \
+    LC_ALL="ja_JP.UTF-8"
 
-EXPOSE 80/TCP 10051/TCP
+EXPOSE 80/TCP 162/UDP 10051/TCP 10052/TCP
 
 ENTRYPOINT ["/start.sh"]
