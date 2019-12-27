@@ -9,4 +9,4 @@ RUN : "add package" && \
 
 EXPOSE 80/TCP 10051/TCP
 
-ENTRYPOINT ["/sbin/tini", "--", "/usr/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["entrypoint.sh"]
