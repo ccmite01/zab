@@ -9,6 +9,9 @@ RUN : "add package" && \
     yum clean all && \
     localedef -f UTF-8 -i ja_JP ja_JP.UTF-8 && \
     sed -i 's/pm.max_children = 10/pm.max_children = 50/g' /etc/php-fpm.d/www.conf && \
+    sed -i 's/fastcgi_pass php-upstream;/fastcgi_pass unix:\/var\/run\/php-fpm-www.sock/g' /etc/nginx/conf.d/fpm-status.conf && \
+    sed -i 's/fastcgi_pass    php-upstream;/fastcgi_pass unix:\/var\/run\/php-fpm-www.sock/g' /etc/nginx/conf.d/php-location.conf && \
+    echo "listen.mode = 0660" >> /etc/php-fpm.d/www.conf && \
     chmod +x /start.sh
 ENV LANG="ja_JP.UTF-8" \
     LANGUAGE="ja_JP:ja" \
